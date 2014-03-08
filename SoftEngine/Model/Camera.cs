@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 
-namespace SoftEngine
+namespace SoftEngine.Model
 {
     class Camera
     {

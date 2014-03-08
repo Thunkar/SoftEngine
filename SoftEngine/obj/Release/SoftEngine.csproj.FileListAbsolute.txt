@@ -34,3 +34,46 @@ C:\Users\Gregorio\documents\visual studio 2012\Projects\SoftEngine\SoftEngine\ob
 C:\Users\Gregorio\documents\visual studio 2012\Projects\SoftEngine\SoftEngine\obj\Release\pri.resfiles
 C:\Users\Gregorio\documents\visual studio 2012\Projects\SoftEngine\SoftEngine\obj\Release\LanguageQualifiers.txt
 C:\Users\Gregorio\documents\visual studio 2012\Projects\SoftEngine\SoftEngine\obj\Release\ProjectArchitectures.txt
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\App.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\Common\StandardStyles.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\MainPage.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\SoftEngine.exe
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\SoftEngine.pdb
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\resources.pri
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\AppxManifest.xml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\SoftEngine.build.appxrecipe
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\SharpDX.dll
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\bin\Release\SharpDX.xml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SoftEngine.csprojResolveAssemblyReference.cache
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\App.g.i.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\App.g.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\Common\StandardStyles.g.i.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\Common\StandardStyles.g.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\MainPage.g.i.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\MainPage.g.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\XamlTypeInfo.g.cs
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\App.xaml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\Common\StandardStyles.xaml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\MainPage.xaml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\App.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\Common\StandardStyles.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\MainPage.xbf
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\XamlSaveStateFile.xml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SoftEngine.exe
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SoftEngine.pdb
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SharpDX\en-us\SharpDX.Properties.Resources.resw
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SoftEngine.csproj.GenerateResource.Cache
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SharpDX.pri
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\SharpDX\qualifiers.txt
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\priconfig.xml
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\priconfig.xml.intermediate
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\layout.resfiles
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\layout.resfiles.intermediate
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\resources.resfiles
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\resources.resfiles.intermediate
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\pri.resfiles
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\pri.resfiles.intermediate
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\qualifiers.txt
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\qualifiers.txt.intermediate
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\MultipleQualifiersPerDimensionFound.txt
+C:\Users\Gregorio\Documents\GitHub\SoftEngine\SoftEngine\obj\Release\ProjectArchitectures.txt

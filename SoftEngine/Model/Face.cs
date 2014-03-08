@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoftEngine
+namespace SoftEngine.Model
 {
     public struct Face
     {

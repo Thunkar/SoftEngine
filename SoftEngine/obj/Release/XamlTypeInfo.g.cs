@@ -24,7 +24,7 @@ namespace SoftEngine
             return _provider.GetXamlTypeByType(type);
         }
 
-        public global::Windows.UI.Xaml.Markup.IXamlType GetXamlType(global::System.String fullName)
+        public global::Windows.UI.Xaml.Markup.IXamlType GetXamlType(string fullName)
         {
             if(_provider == null)
             {
@@ -49,41 +49,51 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
     {
         public global::Windows.UI.Xaml.Markup.IXamlType GetXamlTypeByType(global::System.Type type)
         {
-            string standardName;
-            global::Windows.UI.Xaml.Markup.IXamlType xamlType = null;
-            if(_xamlTypeToStandardName.TryGetValue(type, out standardName))
+            global::Windows.UI.Xaml.Markup.IXamlType xamlType;
+            if (_xamlTypeCacheByType.TryGetValue(type, out xamlType))
             {
-                xamlType = GetXamlTypeByName(standardName);
+                return xamlType;
             }
-            else
+            int typeIndex = LookupTypeIndexByType(type);
+            if(typeIndex != -1)
             {
-                xamlType = GetXamlTypeByName(type.FullName);
+                xamlType = CreateXamlType(typeIndex);
+            }
+            if (xamlType != null)
+            {
+                _xamlTypeCacheByName.Add(xamlType.FullName, xamlType);
+                _xamlTypeCacheByType.Add(xamlType.UnderlyingType, xamlType);
             }
             return xamlType;
         }
 
         public global::Windows.UI.Xaml.Markup.IXamlType GetXamlTypeByName(string typeName)
         {
-            if (global::System.String.IsNullOrEmpty(typeName))
+            if (string.IsNullOrEmpty(typeName))
             {
                 return null;
             }
             global::Windows.UI.Xaml.Markup.IXamlType xamlType;
-            if (_xamlTypes.TryGetValue(typeName, out xamlType))
+            if (_xamlTypeCacheByName.TryGetValue(typeName, out xamlType))
             {
                 return xamlType;
             }
-            xamlType = CreateXamlType(typeName);
+            int typeIndex = LookupTypeIndexByName(typeName);
+            if(typeIndex != -1)
+            {
+                xamlType = CreateXamlType(typeIndex);
+            }
             if (xamlType != null)
             {
-                _xamlTypes.Add(typeName, xamlType);
+                _xamlTypeCacheByName.Add(xamlType.FullName, xamlType);
+                _xamlTypeCacheByType.Add(xamlType.UnderlyingType, xamlType);
             }
             return xamlType;
         }
 
         public global::Windows.UI.Xaml.Markup.IXamlMember GetMemberByLongName(string longMemberName)
         {
-            if (global::System.String.IsNullOrEmpty(longMemberName))
+            if (string.IsNullOrEmpty(longMemberName))
             {
                 return null;
             }
@@ -100,55 +110,212 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
             return xamlMember;
         }
 
-        global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlType> _xamlTypes = new global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlType>();
-        global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlMember> _xamlMembers = new global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlMember>();
-        global::System.Collections.Generic.Dictionary<global::System.Type, string> _xamlTypeToStandardName = new global::System.Collections.Generic.Dictionary<global::System.Type, string>();
+        global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlType>
+                _xamlTypeCacheByName = new global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlType>();
 
-        private void AddToMapOfTypeToStandardName(global::System.Type t, global::System.String str)
+        global::System.Collections.Generic.Dictionary<global::System.Type, global::Windows.UI.Xaml.Markup.IXamlType>
+                _xamlTypeCacheByType = new global::System.Collections.Generic.Dictionary<global::System.Type, global::Windows.UI.Xaml.Markup.IXamlType>();
+
+        global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlMember>
+                _xamlMembers = new global::System.Collections.Generic.Dictionary<string, global::Windows.UI.Xaml.Markup.IXamlMember>();
+
+        string[] _typeNameTable = null;
+        global::System.Type[] _typeTable = null;
+
+        private void InitTypeTables()
         {
-            if(!_xamlTypeToStandardName.ContainsKey(t))
-            {
-                _xamlTypeToStandardName.Add(t, str);
-            }
+            _typeNameTable = new string[8];
+            _typeNameTable[0] = "SoftEngine.ViewModel.MainViewModel";
+            _typeNameTable[1] = "Object";
+            _typeNameTable[2] = "SoftEngine.Model.Engine";
+            _typeNameTable[3] = "SoftEngine.Model.Mesh";
+            _typeNameTable[4] = "SoftEngine.Model.Camera";
+            _typeNameTable[5] = "SoftEngine.MainPage";
+            _typeNameTable[6] = "Windows.UI.Xaml.Controls.Page";
+            _typeNameTable[7] = "Windows.UI.Xaml.Controls.UserControl";
+
+            _typeTable = new global::System.Type[8];
+            _typeTable[0] = typeof(global::SoftEngine.ViewModel.MainViewModel);
+            _typeTable[1] = typeof(global::System.Object);
+            _typeTable[2] = typeof(global::SoftEngine.Model.Engine);
+            _typeTable[3] = typeof(global::SoftEngine.Model.Mesh);
+            _typeTable[4] = typeof(global::SoftEngine.Model.Camera);
+            _typeTable[5] = typeof(global::SoftEngine.MainPage);
+            _typeTable[6] = typeof(global::Windows.UI.Xaml.Controls.Page);
+            _typeTable[7] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
         }
 
-        private object Activate_0_MainPage() { return new global::SoftEngine.MainPage(); }
+        private int LookupTypeIndexByName(string typeName)
+        {
+            if (_typeNameTable == null)
+            {
+                InitTypeTables();
+            }
+            for (int i=0; i<_typeNameTable.Length; i++)
+            {
+                if(0 == string.CompareOrdinal(_typeNameTable[i], typeName))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
+        private int LookupTypeIndexByType(global::System.Type type)
+        {
+            if (_typeTable == null)
+            {
+                InitTypeTables();
+            }
+            for(int i=0; i<_typeTable.Length; i++)
+            {
+                if(type == _typeTable[i])
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
-        private global::Windows.UI.Xaml.Markup.IXamlType CreateXamlType(string typeName)
+        private object Activate_0_MainViewModel() { return new global::SoftEngine.ViewModel.MainViewModel(); }
+        private object Activate_4_Camera() { return new global::SoftEngine.Model.Camera(); }
+        private object Activate_5_MainPage() { return new global::SoftEngine.MainPage(); }
+
+        private global::Windows.UI.Xaml.Markup.IXamlType CreateXamlType(int typeIndex)
         {
             global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType xamlType = null;
             global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType userType;
+            string typeName = _typeNameTable[typeIndex];
+            global::System.Type type = _typeTable[typeIndex];
 
-            switch (typeName)
+            switch (typeIndex)
             {
-            case "Windows.UI.Xaml.Controls.Page":
-                xamlType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType(typeName, typeof(global::Windows.UI.Xaml.Controls.Page));
-                break;
 
-            case "Windows.UI.Xaml.Controls.UserControl":
-                xamlType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType(typeName, typeof(global::Windows.UI.Xaml.Controls.UserControl));
-                break;
-
-            case "SoftEngine.MainPage":
-                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, typeof(global::SoftEngine.MainPage), GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_0_MainPage;
+            case 0:   //  SoftEngine.ViewModel.MainViewModel
+                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_0_MainViewModel;
+                userType.AddMemberName("Engine");
+                userType.AddMemberName("Cube");
+                userType.AddMemberName("Tetra");
+                userType.AddMemberName("Camera");
                 xamlType = userType;
                 break;
 
+            case 1:   //  Object
+                xamlType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 2:   //  SoftEngine.Model.Engine
+                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 3:   //  SoftEngine.Model.Mesh
+                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 4:   //  SoftEngine.Model.Camera
+                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 5:   //  SoftEngine.MainPage
+                userType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_5_MainPage;
+                xamlType = userType;
+                break;
+
+            case 6:   //  Windows.UI.Xaml.Controls.Page
+                xamlType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 7:   //  Windows.UI.Xaml.Controls.UserControl
+                xamlType = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
             }
             return xamlType;
         }
 
 
+        private object get_0_MainViewModel_Engine(object instance)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            return that.Engine;
+        }
+        private void set_0_MainViewModel_Engine(object instance, object Value)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            that.Engine = (global::SoftEngine.Model.Engine)Value;
+        }
+        private object get_1_MainViewModel_Cube(object instance)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            return that.Cube;
+        }
+        private void set_1_MainViewModel_Cube(object instance, object Value)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            that.Cube = (global::SoftEngine.Model.Mesh)Value;
+        }
+        private object get_2_MainViewModel_Tetra(object instance)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            return that.Tetra;
+        }
+        private void set_2_MainViewModel_Tetra(object instance, object Value)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            that.Tetra = (global::SoftEngine.Model.Mesh)Value;
+        }
+        private object get_3_MainViewModel_Camera(object instance)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            return that.Camera;
+        }
+        private void set_3_MainViewModel_Camera(object instance, object Value)
+        {
+            var that = (global::SoftEngine.ViewModel.MainViewModel)instance;
+            that.Camera = (global::SoftEngine.Model.Camera)Value;
+        }
 
         private global::Windows.UI.Xaml.Markup.IXamlMember CreateXamlMember(string longMemberName)
         {
             global::SoftEngine.SoftEngine_XamlTypeInfo.XamlMember xamlMember = null;
-            // No Local Properties
+            global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType userType;
+
+            switch (longMemberName)
+            {
+            case "SoftEngine.ViewModel.MainViewModel.Engine":
+                userType = (global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType)GetXamlTypeByName("SoftEngine.ViewModel.MainViewModel");
+                xamlMember = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlMember(this, "Engine", "SoftEngine.Model.Engine");
+                xamlMember.Getter = get_0_MainViewModel_Engine;
+                xamlMember.Setter = set_0_MainViewModel_Engine;
+                break;
+            case "SoftEngine.ViewModel.MainViewModel.Cube":
+                userType = (global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType)GetXamlTypeByName("SoftEngine.ViewModel.MainViewModel");
+                xamlMember = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlMember(this, "Cube", "SoftEngine.Model.Mesh");
+                xamlMember.Getter = get_1_MainViewModel_Cube;
+                xamlMember.Setter = set_1_MainViewModel_Cube;
+                break;
+            case "SoftEngine.ViewModel.MainViewModel.Tetra":
+                userType = (global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType)GetXamlTypeByName("SoftEngine.ViewModel.MainViewModel");
+                xamlMember = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlMember(this, "Tetra", "SoftEngine.Model.Mesh");
+                xamlMember.Getter = get_2_MainViewModel_Tetra;
+                xamlMember.Setter = set_2_MainViewModel_Tetra;
+                break;
+            case "SoftEngine.ViewModel.MainViewModel.Camera":
+                userType = (global::SoftEngine.SoftEngine_XamlTypeInfo.XamlUserType)GetXamlTypeByName("SoftEngine.ViewModel.MainViewModel");
+                xamlMember = new global::SoftEngine.SoftEngine_XamlTypeInfo.XamlMember(this, "Camera", "SoftEngine.Model.Camera");
+                xamlMember.Getter = get_3_MainViewModel_Camera;
+                xamlMember.Setter = set_3_MainViewModel_Camera;
+                break;
+            }
             return xamlMember;
         }
-
     }
 
     
@@ -184,13 +351,14 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
         virtual public bool IsDictionary { get { throw new global::System.NotImplementedException(); } }
         virtual public bool IsMarkupExtension { get { throw new global::System.NotImplementedException(); } }
         virtual public bool IsBindable { get { throw new global::System.NotImplementedException(); } }
+        virtual public bool IsReturnTypeStub { get { throw new global::System.NotImplementedException(); } }
         virtual public global::Windows.UI.Xaml.Markup.IXamlType ItemType { get { throw new global::System.NotImplementedException(); } }
         virtual public global::Windows.UI.Xaml.Markup.IXamlType KeyType { get { throw new global::System.NotImplementedException(); } }
         virtual public object ActivateInstance() { throw new global::System.NotImplementedException(); }
         virtual public void AddToMap(object instance, object key, object item)  { throw new global::System.NotImplementedException(); }
         virtual public void AddToVector(object instance, object item)  { throw new global::System.NotImplementedException(); }
         virtual public void RunInitializer()   { throw new global::System.NotImplementedException(); }
-        virtual public object CreateFromString(global::System.String input)   { throw new global::System.NotImplementedException(); }
+        virtual public object CreateFromString(string input)   { throw new global::System.NotImplementedException(); }
     }
     
     internal delegate object Activator();
@@ -207,6 +375,7 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
         bool _isArray;
         bool _isMarkupExtension;
         bool _isBindable;
+        bool _isReturnTypeStub;
 
         string _contentPropertyName;
         string _itemTypeName;
@@ -230,6 +399,7 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
         override public bool IsDictionary { get { return (DictionaryAdd != null); } }
         override public bool IsMarkupExtension { get { return _isMarkupExtension; } }
         override public bool IsBindable { get { return _isBindable; } }
+        override public bool IsReturnTypeStub { get { return _isReturnTypeStub; } }
 
         override public global::Windows.UI.Xaml.Markup.IXamlMember ContentProperty
         {
@@ -280,18 +450,18 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(UnderlyingType.TypeHandle);
         }
 
-        override public global::System.Object CreateFromString(global::System.String input)
+        override public object CreateFromString(string input)
         {
             if (_enumValues != null)
             {
-                global::System.Int32 value = 0;
+                int value = 0;
 
                 string[] valueParts = input.Split(',');
 
                 foreach (string valuePart in valueParts) 
                 {
                     object partValue;
-                    global::System.Int32 enumFieldValue = 0;
+                    int enumFieldValue = 0;
                     try
                     {
                         if (_enumValues.TryGetValue(valuePart.Trim(), out partValue))
@@ -308,7 +478,7 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
                             {
                                 foreach( string key in _enumValues.Keys )
                                 {
-                                    if( global::System.String.Compare(valuePart.Trim(), key, global::System.StringComparison.OrdinalIgnoreCase) == 0 )
+                                    if( string.Compare(valuePart.Trim(), key, global::System.StringComparison.OrdinalIgnoreCase) == 0 )
                                     {
                                         if( _enumValues.TryGetValue(key.Trim(), out partValue) )
                                         {
@@ -356,6 +526,11 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
         public void SetIsBindable()
         {
             _isBindable = true;
+        }
+
+        public void SetIsReturnTypeStub()
+        {
+            _isReturnTypeStub = true;
         }
 
         public void SetItemTypeName(string itemTypeName)
@@ -418,7 +593,7 @@ namespace SoftEngine.SoftEngine_XamlTypeInfo
             get { return _provider.GetXamlTypeByName(_typeName); }
         }
 
-        public void SetTargetTypeName(global::System.String targetTypeName)
+        public void SetTargetTypeName(string targetTypeName)
         {
             _targetTypeName = targetTypeName;
         }

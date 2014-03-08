@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 
-namespace SoftEngine
+namespace SoftEngine.Model
 {
 
     class Mesh
@@ -23,11 +23,5 @@ namespace SoftEngine
             this.Name = name;
             this.Rotation = Quaternion.Identity;
         }
-
-
-
-
-
-
     }
 }

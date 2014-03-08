@@ -7,19 +7,33 @@ using SharpDX;
 using Windows.UI.Xaml.Media.Imaging;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.ComponentModel;
 
-namespace SoftEngine
+namespace SoftEngine.Model
 {
-    class Device
+    class Engine : INotifyPropertyChanged
     {
         private byte[] backBuffer;
-        private WriteableBitmap wbm;
-
-        public Device(WriteableBitmap wbm)
+        private WriteableBitmap bitmap;
+        public WriteableBitmap Bitmap
         {
-            this.wbm = wbm;
-            this.backBuffer = new byte[this.wbm.PixelHeight * this.wbm.PixelWidth * 4];
+            get
+            {
+                return bitmap;
+            }
+            set
+            {
+                bitmap = value;
+                NotifyPropertyChanged("TargetBitmap");
+            }
         }
+
+        public Engine(int width, int height)
+        {
+            this.Bitmap = new WriteableBitmap(width, height);
+            this.backBuffer = new byte[this.Bitmap.PixelHeight * this.Bitmap.PixelWidth * 4];
+        }
+
 
         public void Clear(byte r, byte g, byte b, byte a)
         {
@@ -36,19 +50,19 @@ namespace SoftEngine
         public void Present()
         {
             //the method in the tutorial doesn't exist, test this!
-            using (Stream stream = this.wbm.PixelBuffer.AsStream())
+            using (Stream stream = this.Bitmap.PixelBuffer.AsStream())
             {
                 // writing our back buffer into our WriteableBitmap stream
                 stream.Write(this.backBuffer, 0, backBuffer.Length);
             }
             // request a redraw of the entire bitmap
-            this.wbm.Invalidate();
+            this.Bitmap.Invalidate();
         }
 
         // Called to put a pixel on screen at a specific X,Y coordinates
         public void PutPixel(int x, int y, Color4 color)
         {
-            int index = (x + y * this.wbm.PixelWidth) * 4;
+            int index = (x + y * this.Bitmap.PixelWidth) * 4;
             backBuffer[index] = (byte)(color.Blue * 255);
             backBuffer[index + 1] = (byte)(color.Green * 255);
             backBuffer[index + 2] = (byte)(color.Red * 255);
@@ -64,8 +78,8 @@ namespace SoftEngine
             // The transformed coordinates will be based on coordinate system
             // starting on the center of the screen. But drawing on screen normally starts
             // from top left. We then need to transform them again to have x:0, y:0 on top left.
-            var x = point.X * this.wbm.PixelWidth + this.wbm.PixelWidth / 2.0f;
-            var y = -point.Y * this.wbm.PixelHeight + this.wbm.PixelHeight / 2.0f;
+            var x = point.X * this.Bitmap.PixelWidth + this.Bitmap.PixelWidth / 2.0f;
+            var y = -point.Y * this.Bitmap.PixelHeight + this.Bitmap.PixelHeight / 2.0f;
             return (new Vector2(x, y));
         }
 
@@ -73,7 +87,7 @@ namespace SoftEngine
         public void DrawPoint(Vector2 point)
         {
             // Clipping what's visible on screen
-            if (point.X >= 0 && point.Y >= 0 && point.X < this.wbm.PixelWidth && point.Y < this.wbm.PixelHeight)
+            if (point.X >= 0 && point.Y >= 0 && point.X < this.Bitmap.PixelWidth && point.Y < this.Bitmap.PixelHeight)
             {
                 // Drawing a yellow point
                 PutPixel((int)point.X, (int)point.Y, new Color4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -87,7 +101,7 @@ namespace SoftEngine
             var viewMatrix = Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitY);
             //Then, the projection matrix to add some perspective
             var projectionMatrix = Matrix.PerspectiveFovRH(0.78f,
-                                                           (float)this.wbm.PixelWidth / this.wbm.PixelHeight,
+                                                           (float)this.Bitmap.PixelWidth / this.Bitmap.PixelHeight,
                                                            0.01f, 1.0f);
 
             //Then the worldmatrix. Beware to apply rotation before translation 
@@ -143,6 +157,14 @@ namespace SoftEngine
                 if (e2 > -dy) { err -= dy; x0 += sx; }
                 if (e2 < dx) { err += dx; y0 += sy; }
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string property)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
     }
 }
